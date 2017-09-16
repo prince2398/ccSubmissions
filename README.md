@@ -1,2 +1,3 @@
 # ccSubmissions
-Fetching all submissions of giver=n user using WebScraping.
+
+Fetching all submissions of given user using WebScraping.
