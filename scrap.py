@@ -3,14 +3,15 @@ from bs4 import BeautifulSoup
 import re
 from pprint import pprint
 
-uName = 'nikhilksingh97'
+uName = 'singh_prishita'
 
-def getURL(uName,pg):
+
+def getURL(uName,pg,yr):
     subURLs=[]
 
     for Pg in range(0,pg):
 
-        url = 'https://www.codechef.com/submissions?page='+str(Pg)+'&sort_by=All&sorting_order=asc&language=All&status=All&year=2017&handle='+uName+'&pcode=&ccode=&Submit=GO'
+        url = 'https://www.codechef.com/submissions?page='+str(Pg)+'&sort_by=All&sorting_order=asc&language=All&status=All&year='+str(yr)+'&handle='+uName+'&pcode=&ccode=&Submit=GO'
 
         resp = requests.get(url)
 
@@ -18,38 +19,42 @@ def getURL(uName,pg):
 
         table = soup.findAll('div',attrs = {'class':'tablebox'})
 
-        tbody = table[0].table.tbody
+        if len(table)!=0:
 
-        submissions = tbody.findAll('tr')
+            tbody = table[0].table.tbody
 
-        subnos=[]
+            submissions = tbody.findAll('tr')
 
-        for sub in submissions:
-            no = sub.td.text
-            subnos.append(no)
-
-
-        for sNo in subnos:
-            sNo = 'https://www.codechef.com/viewsolution/'+sNo
-            subURLs.append(sNo)
+            for sub in submissions:
+                no = sub.td.text
+                if no!='No Recent Activity':
+                    subURLs.append('https://www.codechef.com/viewsolution/'+no)
 
     return subURLs
 
-def getPg(uName):
-    url= 'https://www.codechef.com/submissions?sort_by=All&sorting_order=asc&language=All&status=All&year=2017&handle='+uName+'&pcode=&ccode=&Submit=GO'
+def getPg(uName,yr):
+    url= 'https://www.codechef.com/submissions?sort_by=All&sorting_order=asc&language=All&status=All&year='+str(yr)+'&handle='+uName+'&pcode=&ccode=&Submit=GO'
     page = requests.get(url)
 
     soup = BeautifulSoup(page.content,'html5lib')
 
     soup = soup.findAll('div',attrs = {'class':'pageinfo'})
-    soup = soup[0].text
-    soup = re.findall('\d+',soup)
-    Pg = soup[1]
-    return Pg
+    if len(soup)!=0 :
+        soup = soup[0].text
+        soup = re.findall('\d+',soup)
+        Pg = soup[1]
+        return Pg
+    else:
+        return 1;
 
-pg=int(getPg(uName))
-URLs = getURL(uName,pg)
+URLs = []
+
+for yr in range(2017,2009,-1):
+    pg=int(getPg(uName,yr))
+    URLs = URLs + getURL(uName,pg,yr)
 subCount = len(URLs)
-print(pg)
-print("total no. of submissions = "+str(subCount))
 pprint(URLs)
+print("total no. of submissions = "+str(subCount))
+
+
+#Got URLS of Every submission by a user above
