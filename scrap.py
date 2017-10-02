@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import re
 from pprint import pprint
 import os
+from tqdm import tqdm
+
 cnt=0
 
 #to return extension of file
@@ -15,6 +17,8 @@ def calcExt(lang) :
         'ADA' : 'ada',
         'PYPY' : 'py'
     }[lang]
+
+
 #To write in  a file
 def writeCode(filename,code):
     global cnt
@@ -26,10 +30,13 @@ def writeCode(filename,code):
 
     codeFile.close()
     cnt+=1
+
+    
 #main function to write code in a file by sub no.
 def subNoToFile(subNo):
     global uName
     url = 'https://www.codechef.com/viewsolution/'+subNo+'/index.html'
+
     #to get html content
     resp = requests.get(url)
     soup = BeautifulSoup(resp.content,'html5lib')
@@ -53,10 +60,8 @@ def subNoToFile(subNo):
         path = uName+'/'+filename
 
         #to get submitted code in list line by line
-
         code = soup.pre.ol
         code = code.findAll('li')
-
         writeCode(path,code)
 
 
@@ -65,7 +70,6 @@ def getSubNo(uName,pg,yr):
     subNos=[]
 
     for Pg in range(0,pg):
-
         url = 'https://www.codechef.com/submissions?page='+str(Pg)+'&sort_by=All&sorting_order=asc&language=All&status=All&year='+str(yr)+'&handle='+uName+'&pcode=&ccode=&Submit=GO'
 
         resp = requests.get(url)
@@ -102,6 +106,7 @@ def getPg(uName,yr):
 
 #to get total list of all submission ids of a particular user
 def subList(username):
+    
     subs = []
 
     for yr in range(2017,2009,-1):
@@ -116,8 +121,10 @@ def subList(username):
 uName = 'pp2398'
 
 Subs = subList(uName)
-for Sub in Subs:
+
+for Sub in tqdm(Subs):
     subNoToFile(Sub)
+    
 no = len(Subs)
 msg = str(cnt)+'/'+str(no)+" no. of submmissions are extracted."
 print(msg)
