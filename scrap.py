@@ -28,6 +28,7 @@ def writeCode(filename,code):
     cnt+=1
 #main function to write code in a file by sub no.
 def subNoToFile(subNo):
+    global uName
     url = 'https://www.codechef.com/viewsolution/'+subNo+'/index.html'
     #to get html content
     resp = requests.get(url)
@@ -42,11 +43,14 @@ def subNoToFile(subNo):
         title = re.findall('\w+',head)
         ext = calcExt(title[3])
         filename = subNo+'.'+ext
+        abspath = os.path.abspath(__file__)
+        dname = os.path.dirname(abspath)
+        os.chdir(dname)
         try:
-            os.makedirs('submissions')
+            os.makedirs(uName)
         except OSError:
             pass
-        path = 'submissions/'+filename
+        path = uName+'/'+filename
 
         #to get submitted code in list line by line
 
